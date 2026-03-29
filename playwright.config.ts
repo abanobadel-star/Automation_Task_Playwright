@@ -10,6 +10,13 @@ dotenv.config({
 
 console.log(`Running tests on environment: ${ENV}`);
 console.log(`Base URL: ${process.env.BASE_URL}`);
+console.log('All environment variables loaded:');
+console.log({
+  BASE_URL: process.env.BASE_URL,
+  ENV: process.env.ENV,
+  CI: process.env.CI,
+  TAG: process.env.TAG
+});
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -35,13 +42,26 @@ export default defineConfig({
     trace: 'on-first-retry',
     headless: process.env.CI ? true : false,
     baseURL: process.env.BASE_URL,
+    video: 'on',
+    // Anti-detection arguments for bot prevention
+    launchArgs: [
+      '--disable-blink-features=AutomationControlled',
+      '--disable-dev-shm-usage',
+    ],
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        launchArgs: [
+          '--disable-blink-features=AutomationControlled',
+          '--disable-dev-shm-usage',
+        ],
+      },
     },
 
     // {

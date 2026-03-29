@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  playwright:
+    build: .
+    container_name: playwright-tests
+    ipc: host
+
+    env_file:
+      - .env.docker
+
+    environment:
+      CI: 1
+      ENV: ${ENV:-staging}
+      TAG: ${TAG:-@regression}
+      BASE_URL: ${BASE_URL:-https://www.ebay.com/}
+
+    volumes:
+      - ./env:/app/env
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
+
+    command: >
+      sh -c "npx playwright test --grep \"$TAG\""
