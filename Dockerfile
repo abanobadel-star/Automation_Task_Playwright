@@ -1,23 +1,19 @@
-# Use the official Playwright image with Node.js and browsers pre-installed
+# Official Playwright image (latest stable recommended)
 FROM mcr.microsoft.com/playwright:v1.58.2-noble
 
-# Set the working directory
 WORKDIR /app
 
-# Set CI environment to enable headless mode
 ENV CI=1
 
-# Copy package.json and package-lock.json (if available)
+# Install dependencies first (better caching)
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the application code
+# Copy project files
 COPY . .
 
-# Install Playwright browsers (if not already included in the image)
-RUN npx playwright install
+# Browsers already included, but safe fallback
+RUN npx playwright install --with-deps
 
-# Run the tests with IPC host flag for better Chromium performance
-CMD ["sh", "-c", "npx playwright test"]
+# Default command
+CMD ["npx", "playwright", "test"]

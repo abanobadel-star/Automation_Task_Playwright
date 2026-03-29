@@ -36,25 +36,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Build Docker image
-      run: docker build -t automation-task .
+      # Optional but recommended for stability
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Run Playwright tests
-      run: |
-        export ENV=${{ github.event.inputs.environment || 'staging' }}
-        export TAG=${{ github.event.inputs.tag || '@regression' }}
-        docker-compose up --abort-on-container-exit --remove-orphans
-      env:
-        ENV: ${{ github.event.inputs.environment || 'staging' }}
-        TAG: ${{ github.event.inputs.tag || '@regression' }}
+      - name: Run Playwright tests with Docker Compose
+        run: |
+          export ENV=${{ github.event.inputs.environment || 'staging' }}
+          export TAG=${{ github.event.inputs.tag || '@regression' }}
+          docker compose up --abort-on-container-exit --remove-orphans
 
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - name: Shutdown containers
+        if: always()
+        run: docker compose down
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
