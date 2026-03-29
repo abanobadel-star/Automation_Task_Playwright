@@ -32,3 +32,17 @@ run command npx playwright test tests/homePage.spec.ts
 ## open report 
 6. open HTML report 
 run command npx playwright show-report
+
+## to build docker file 
+7. open terminal 
+run command : docker build -t automation-task . 
+
+## to run test using docker 
+8. run command : docker run --rm automation-task
+
+## run test using docker on specific env 
+9. $env:ENV = 'prod' ; docker-compose up  
+
+## run test using docker on specific env and tag 
+10. docker-compose run --rm -e ENV=prod -e TAG=@smoke playwright
+    
